@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
-import { verify } from "jsonwebtoken"
+
+// Move this to a config route that doesn't use Edge Runtime
+export const config = {
+  runtime: 'nodejs',
+  matcher: '/api/:path*'
+}
 
 export function middleware(request: NextRequest) {
   const token = request.headers.get("authorization")?.split(" ")[1]
@@ -10,6 +15,8 @@ export function middleware(request: NextRequest) {
   }
 
   try {
+    // Import JWT verification dynamically to avoid Edge Runtime issues
+    const { verify } = require('jsonwebtoken')
     const decoded = verify(token, process.env.JWT_SECRET!)
     const requestHeaders = new Headers(request.headers)
     requestHeaders.set("user", JSON.stringify(decoded))
@@ -22,9 +29,5 @@ export function middleware(request: NextRequest) {
   } catch (error) {
     return NextResponse.json({ message: "Invalid authentication token" }, { status: 401 })
   }
-}
-
-export const config = {
-  matcher: ["/api/drones/:path*", "/api/missions/:path*"],
 }
 
