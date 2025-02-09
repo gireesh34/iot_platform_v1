@@ -1,0 +1,81 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["referentialIntegrity"]
+}
+
+model User {
+  id         String    @id @default(cuid())
+  name       String?
+  email      String    @unique
+  password   String
+  role       UserRole  @default(VIEWER)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  drones     Drone[]
+  missions   Mission[]
+}
+
+model Drone {
+  id            String    @id @default(cuid())
+  name          String
+  model         String
+  status        DroneStatus
+  batteryLevel  Int
+  lastLocation  Json
+  operator      User      @relation(fields: [operatorId], references: [id])
+  operatorId    String
+  missions      Mission[]
+  flightLogs    FlightLog[]
+}
+
+model Mission {
+  id          String    @id @default(cuid())
+  name        String
+  status      MissionStatus
+  startTime   DateTime
+  endTime     DateTime?
+  drone       Drone     @relation(fields: [droneId], references: [id])
+  droneId     String
+  operator    User      @relation(fields: [operatorId], references: [id])
+  operatorId  String
+  flightLogs  FlightLog[]
+}
+
+model FlightLog {
+  id           String   @id @default(cuid())
+  mission      Mission  @relation(fields: [missionId], references: [id])
+  missionId    String
+  drone        Drone    @relation(fields: [droneId], references: [id])
+  droneId      String
+  timestamp    DateTime
+  location     Json
+  altitude     Float
+  batteryLevel Int
+}
+
+enum UserRole {
+  ADMIN
+  OPERATOR
+  VIEWER
+}
+
+enum DroneStatus {
+  IDLE
+  IN_FLIGHT
+  MAINTENANCE
+  CHARGING
+}
+
+enum MissionStatus {
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+  ABORTED
+}
+
