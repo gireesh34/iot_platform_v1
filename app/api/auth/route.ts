@@ -3,31 +3,54 @@ import prisma from '@/lib/db';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
+export const runtime = 'nodejs' // Force Node.js runtime
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    console.log('Auth request:', body); // Debug log
-
     const { email, password, action, name } = body;
 
     // Handle signup
     if (action === 'signup') {
+      // Check if user exists
+      const existingUser = await prisma.user.findUnique({
+        where: { email }
+      });
+
+      if (existingUser) {
+        return NextResponse.json({ error: 'Email already registered' }, { status: 400 });
+      }
+
       const hashedPassword = await bcrypt.hash(password, 10);
       const user = await prisma.user.create({
         data: {
           email,
           password: hashedPassword,
           name,
-          role: 'VIEWER' // Default role from your schema
+          role: 'VIEWER'
+        },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true
         }
       });
-      return NextResponse.json({ user: { id: user.id, email: user.email } });
+
+      return NextResponse.json({ user });
     }
 
     // Handle login
     if (action === 'login') {
       const user = await prisma.user.findUnique({
-        where: { email }
+        where: { email },
+        select: {
+          id: true,
+          email: true,
+          password: true,
+          name: true,
+          role: true
+        }
       });
 
       if (!user) {
@@ -40,12 +63,17 @@ export async function POST(request: Request) {
       }
 
       const token = jwt.sign(
-        { userId: user.id },
-        process.env.JWT_SECRET || 'fallback-secret',
+        { 
+          userId: user.id,
+          email: user.email,
+          role: user.role 
+        },
+        process.env.JWT_SECRET!,
         { expiresIn: '1d' }
       );
 
-      return NextResponse.json({ token, user: { id: user.id, email: user.email } });
+      const { password: _, ...userWithoutPassword } = user;
+      return NextResponse.json({ token, user: userWithoutPassword });
     }
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });

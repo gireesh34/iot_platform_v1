@@ -1,20 +1,18 @@
 import { PrismaClient } from '@prisma/client'
 
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined
-}
-
+// Prevent multiple instances of Prisma Client in development
 const prismaClientSingleton = () => {
   return new PrismaClient({
-    log: ['query', 'error', 'warn'],
-    datasources: {
-      db: {
-        url: process.env.DATABASE_URL
-      }
-    },
-    errorFormat: 'minimal',
+    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+    datasourceUrl: process.env.DATABASE_URL,
   })
 }
+
+type GlobalWithPrisma = typeof globalThis & {
+  prisma?: ReturnType<typeof prismaClientSingleton>
+}
+
+const globalForPrisma: GlobalWithPrisma = globalThis
 
 export const prisma = globalForPrisma.prisma ?? prismaClientSingleton()
 
