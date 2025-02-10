@@ -18,12 +18,7 @@ async function testConnection() {
     console.log('Successfully connected to database');
     await connection.end();
   } catch (error) {
-    console.error('Connection failed with details:', {
-      code: (error as any).code,
-      errno: (error as any).errno,
-      sqlState: (error as any).sqlState,
-      message: (error as any).message
-    });
+    console.error('Connection failed with details:', error);
   }
 }
 

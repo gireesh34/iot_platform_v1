@@ -1,10 +1,16 @@
-import { PrismaClient } from '@prisma/client'
+import { Prisma, PrismaClient } from '.prisma/client'
+// OR if that doesn't work:
+// import { PrismaClient } from '../.prisma/client'
 
 // Prevent multiple instances of Prisma Client in development
 const prismaClientSingleton = () => {
   return new PrismaClient({
     log: ['error'],
-    datasourceUrl: process.env.DATABASE_URL,
+    datasources: {
+      db: {
+        url: process.env.DATABASE_URL
+      }
+    }
   })
 }
 

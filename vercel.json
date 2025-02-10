@@ -3,16 +3,27 @@
   "builds": [
     {
       "src": "package.json",
-      "use": "@vercel/next"
+      "use": "@vercel/next",
+      "config": {
+        "maxLambdaSize": "50mb",
+        "functions": {
+          "app/**/*": {
+            "memory": 1024
+          },
+          "pages/**/*": {
+            "memory": 1024
+          }
+        }
+      }
     }
   ],
   "env": {
-    "DATABASE_URL": "@database_url",
-    "JWT_SECRET": "@jwt_secret"
+    "DATABASE_URL": "mysql://u932646786_iot_data:G7t$Lq9!xZ2w@srv1750.hstgr.io:3306/u932646786_Iot_platform?sslmode=require&connection_limit=5&connect_timeout=30&pool_timeout=30",
+    "JWT_SECRET": "a2cfed2d1689c9aeb91e4bdcc32945a90aad2b663b603a9d4ee8154d3ab7f76f"
   },
   "build": {
     "env": {
-      "DATABASE_URL": "@database_url"
+      "DATABASE_URL": "mysql://u932646786_iot_data:G7t$Lq9!xZ2w@srv1750.hstgr.io:3306/u932646786_Iot_platform?sslmode=require&connection_limit=5&connect_timeout=30&pool_timeout=30"
     }
   }
 } 
