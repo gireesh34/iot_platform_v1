@@ -1,83 +1,83 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { ExclamationTriangleIcon } from "@radix-ui/react-icons"
 import { signup } from "@/lib/auth"
+import { toast } from "@/components/ui/use-toast"
+import Link from "next/link"
 
-export function SignUpForm({ onSuccess }: { onSuccess: () => void }) {
-  const [name, setName] = useState("")
+interface SignUpFormProps {
+  onSuccess: () => void
+}
+
+export function SignUpForm({ onSuccess }: SignUpFormProps) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
+  const [name, setName] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError("")
+    setIsLoading(true)
 
     try {
-      const result = await signup({ name, email, password })
-      if (result) {
+      const user = await signup({ email, password, name })
+      if (user) {
+        toast({
+          title: "Success",
+          description: "Account created successfully",
+        })
         onSuccess()
       }
-    } catch (err) {
-      setError("Failed to create account")
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to create account",
+      })
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <Card className="w-[400px]">
-      <CardHeader>
-        <CardTitle>Create an Account</CardTitle>
-        <CardDescription>
-          Enter your details below to create your account
-        </CardDescription>
+    <Card className="w-[350px]">
+      <CardHeader className="text-center space-y-1">
+        <CardTitle className="text-2xl font-bold">Sign Up</CardTitle>
+        <p className="text-sm text-muted-foreground">Create an account to get started</p>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
-            <Alert variant="destructive">
-              <ExclamationTriangleIcon className="h-4 w-4" />
-              <AlertTitle>Error</AlertTitle>
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
           <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
             <Input
-              id="name"
               type="text"
+              placeholder="Full Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
             <Input
-              id="email"
               type="email"
+              placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
             <Input
-              id="password"
               type="password"
+              placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
           </div>
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="w-full" disabled={isLoading}>
             Sign Up
           </Button>
         </form>
@@ -85,12 +85,11 @@ export function SignUpForm({ onSuccess }: { onSuccess: () => void }) {
       <CardFooter className="flex justify-center">
         <p className="text-sm text-muted-foreground">
           Already have an account?{" "}
-          <a href="/auth/login" className="text-primary hover:underline">
+          <Link href="/auth/login" className="text-primary hover:underline">
             Login
-          </a>
+          </Link>
         </p>
       </CardFooter>
     </Card>
   )
 }
-

@@ -34,7 +34,7 @@ export function DeviceMonitor({ deviceId }: DeviceMonitorProps) {
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span>{device.name}</span>
-          <Badge variant={device.status === "online" ? "success" : "destructive"}>{device.status}</Badge>
+          <Badge variant={device.status === "online" ? "default" : "destructive"}>{device.status}</Badge>
         </CardTitle>
       </CardHeader>
       <CardContent>

@@ -22,6 +22,8 @@ const apiKeys = [
   },
 ]
 
+export default ApiKeys;
+
 export function ApiKeys() {
   const handleCopy = (key: string) => {
     navigator.clipboard.writeText(key)

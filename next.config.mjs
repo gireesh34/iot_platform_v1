@@ -14,13 +14,19 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
+    domains: [
+      `${process.env.NEXT_PUBLIC_SUPABASE_URL}`.replace('https://', ''),
+      'rteatcvyvyktoeggdzad.supabase.co'
+    ],
     unoptimized: true,
   },
-  output: 'standalone',
   experimental: {
-    serverComponentsExternalPackages: ['@prisma/client']
+    optimizeCss: false, // Disable CSS optimization
+    webpackBuildWorker: true,
   },
-  reactStrictMode: true,
+  output: 'standalone',
+  poweredByHeader: false,
+  reactStrictMode: true
 }
 
 mergeConfig(nextConfig, userConfig)

@@ -29,6 +29,9 @@ export function SiteHeader() {
           <Link href="/app/analytics" className="font-medium">
             Analytics
           </Link>
+          <Link href="/app/settings" className="font-medium">
+            Settings
+          </Link>
         </nav>
         <div className="flex items-center space-x-4">
           <ModeToggle />

@@ -1,6 +1,6 @@
-.git
 node_modules
-.next
-.env*
-.gitignore
-README.md 
+.env.local
+.env.development
+.env.test
+.vscode
+.git

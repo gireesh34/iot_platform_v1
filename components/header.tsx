@@ -19,34 +19,10 @@ export function Header() {
     setMounted(true)
   }, [])
 
-  // Don't render the header in /app/* routes
-  if (pathname?.startsWith('/app')) {
-    return null
-  }
-
   const handleLogout = () => {
     logout()
     setUser(null)
     router.push("/")
-  }
-
-  // Prevent hydration mismatch by not rendering navigation until mounted
-  if (!mounted) {
-    return (
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
-          <div className="flex gap-6 md:gap-10">
-            <Link href="/" className="flex items-center space-x-2">
-              <Drone className="h-6 w-6" />
-              <span className="inline-block font-bold">IoT Platform</span>
-            </Link>
-          </div>
-          <div className="flex items-center space-x-4">
-            <ModeToggle />
-          </div>
-        </div>
-      </header>
-    )
   }
 
   return (
@@ -72,6 +48,9 @@ export function Header() {
               </Link>
               <Link href="/app/analytics" className="text-sm font-medium transition-colors hover:text-primary">
                 Analytics
+              </Link>
+              <Link href="/app/settings" className="text-sm font-medium transition-colors hover:text-primary">
+                Settings
               </Link>
             </nav>
           ) : (
@@ -115,4 +94,3 @@ export function Header() {
     </header>
   )
 }
-

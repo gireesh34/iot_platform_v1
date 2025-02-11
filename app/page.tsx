@@ -1,12 +1,21 @@
-import { Features } from "@/components/features"
-import { Hero } from "@/components/hero"
-import { Pricing } from "@/components/pricing"
-import { Contact } from "@/components/contact"
+import { Features } from '@/components/features';
+import { Hero } from '@/components/hero';
+import { Pricing } from '@/components/pricing';
+import { Contact } from '@/components/contact';
+import { supabaseServer } from '@/utils/supabase/server';
+import { cookies } from 'next/headers';
+import { Header } from "@/components/header"
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const cookieStore = await cookies();
+  const supabase = supabaseServer;
+
+  const { data: todos } = await supabase.from('todos').select();
+
   return (
-    <div className="flex flex-col min-h-screen">
-      <main className="flex-grow">
+    <>
+      <Header />
+      <main className="flex min-h-screen flex-col items-center justify-between p-24">
         {/* Hero Section */}
         <Hero />
 
@@ -22,14 +31,22 @@ export default function LandingPage() {
 
         {/* Contact Section */}
         <Contact />
+
+        {/* Todos Section */}
+        <section id="todos" className="py-20">
+          <ul>
+            {todos?.map((todo: { id: string; title: string }) => (
+              <li key={todo.id}>{todo.title}</li>
+            ))}
+          </ul>
+        </section>
       </main>
 
       <footer className="border-t py-8">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>© 2024 Drone IoT Platform. All rights reserved.</p>
+          <p>© 2025 Drone IoT Platform. All rights reserved.</p>
         </div>
       </footer>
-    </div>
-  )
+    </>
+  );
 }
-

@@ -1,22 +1,8 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
-import jwt from 'jsonwebtoken'
+import { verify } from "jsonwebtoken"
 
-// Move this to a config route that doesn't use Edge Runtime
-export const config = {
-  runtime: 'nodejs',
-  matcher: [
-    '/api/:path*',
-    '/app/:path*'
-  ]
-}
-
-export async function middleware(request: NextRequest) {
-  // Skip auth check for login and signup routes
-  if (request.nextUrl.pathname.startsWith('/api/auth')) {
-    return NextResponse.next()
-  }
-
+export function middleware(request: NextRequest) {
   const token = request.headers.get("authorization")?.split(" ")[1]
 
   if (!token) {
@@ -24,9 +10,10 @@ export async function middleware(request: NextRequest) {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!)
+    const decoded = verify(token, process.env.JWT_SECRET!)
     const requestHeaders = new Headers(request.headers)
     requestHeaders.set("user", JSON.stringify(decoded))
+    requestHeaders.set('x-pathname', request.nextUrl.pathname)
 
     return NextResponse.next({
       request: {
@@ -38,3 +25,6 @@ export async function middleware(request: NextRequest) {
   }
 }
 
+export const config = {
+  matcher: ["/api/drones/:path*", "/api/missions/:path*"],
+}

@@ -41,3 +41,5 @@ export function SecuritySettings() {
     </Card>
   )
 } 
+
+export default SecuritySettings;

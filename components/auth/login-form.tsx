@@ -2,10 +2,11 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { login } from "@/lib/auth"
 import { toast } from "@/components/ui/use-toast"
+import Link from "next/link"
 
 interface LoginFormProps {
   onSuccess: () => void
@@ -21,9 +22,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
     setIsLoading(true)
 
     try {
-      console.log('Attempting login with:', { email, password });
       const user = await login({ email, password })
-      console.log('Login response:', user);
       if (user) {
         toast({
           title: "Success",
@@ -32,7 +31,6 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
         onSuccess()
       }
     } catch (error) {
-      console.error('Login form error:', error);
       toast({
         variant: "destructive",
         title: "Error",
@@ -45,8 +43,9 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
 
   return (
     <Card className="w-[350px]">
-      <CardHeader>
-        <CardTitle>Login</CardTitle>
+      <CardHeader className="text-center space-y-1">
+        <CardTitle className="text-2xl font-bold">Login</CardTitle>
+        <p className="text-sm text-muted-foreground">Enter your credentials to access your account</p>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -73,7 +72,14 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
           </Button>
         </form>
       </CardContent>
+      <CardFooter className="flex justify-center">
+        <p className="text-sm text-muted-foreground">
+          Don't have an account?{" "}
+          <Link href="/auth/signup" className="text-primary hover:underline">
+            Sign up
+          </Link>
+        </p>
+      </CardFooter>
     </Card>
   )
 }
-

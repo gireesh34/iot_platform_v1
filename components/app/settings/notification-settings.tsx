@@ -62,3 +62,4 @@ export function NotificationSettings() {
     </Card>
   )
 } 
+export default NotificationSettings;

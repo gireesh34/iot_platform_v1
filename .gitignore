@@ -38,9 +38,3 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .vercel
-
-# Add this line to your existing .gitignore
-.env.build
-
-.env*.local
-.vercel
