@@ -20,11 +20,15 @@ const nextConfig = {
     ],
     unoptimized: true,
   },
+  env: {
+    VERCEL_ENV: process.env.VERCEL_ENV || 'development'
+  },
   experimental: {
     optimizeCss: false, // Disable CSS optimization
     webpackBuildWorker: true,
   },
-  output: 'standalone',
+  output: process.env.VERCEL_ENV ? 'standalone' : undefined,
+  distDir: process.env.VERCEL_ENV ? '.vercel/output' : '.next',
   poweredByHeader: false,
   reactStrictMode: true
 }

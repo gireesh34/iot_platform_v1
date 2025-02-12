@@ -1,37 +1,22 @@
+// Replace jsonwebtoken with Web Crypto API implementation
 import { SignJWT, jwtVerify } from 'jose'
-import { cookies } from 'next/headers'
-import { type NextRequest } from 'next/server'
-import { logger } from './logger'
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'your-secret-key'
-)
-
-export async function sign(payload: { sub: string; jti: string; iat: number }): Promise<string> {
-  return await new SignJWT(payload)
-    .setProtectedHeader({ alg: 'HS256' })
-    .setExpirationTime('24h')
-    .sign(JWT_SECRET)
-}
-
-export async function verify(token: string): Promise<any> {
+export async function verify(token: string) {
+  const secret = new TextEncoder().encode(process.env.JWT_SECRET)
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET)
+    const { payload } = await jwtVerify(token, secret)
     return payload
-  } catch (error) {
+  } catch (err) {
     return null
   }
 }
 
-export async function getJWTFromRequest(request: NextRequest) {
-  const token = request.headers.get('authorization')?.replace('Bearer ', '')
-  if (!token) return null
-  return await verify(token)
-}
-
-export async function getJWTFromCookies() {
-  const cookieStore = cookies()
-  const token = cookieStore.get('jwt')?.value
-  if (!token) return null
-  return await verify(token)
+export async function sign(payload: any) {
+  const secret = new TextEncoder().encode(process.env.JWT_SECRET)
+  const jwt = await new SignJWT(payload)
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime('24h')
+    .sign(secret)
+  return jwt
 }

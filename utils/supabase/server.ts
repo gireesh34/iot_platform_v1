@@ -4,31 +4,48 @@ import { type Database } from '@/lib/types/database'
 import { cookies } from 'next/headers'
 
 export function createClient(cookieStore = cookies()) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  if (!supabaseUrl || !supabaseUrl.startsWith('https://')) {
+    throw new Error('Invalid NEXT_PUBLIC_SUPABASE_URL')
+  }
+
+  if (!supabaseKey) {
+    throw new Error('Missing NEXT_PUBLIC_SUPABASE_ANON_KEY')
+  }
+
   return createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    supabaseUrl,
+    supabaseKey,
     {
       cookies: {
         get(name: string) {
           return cookieStore.get(name)?.value
         },
         set(name: string, value: string, options: CookieOptions) {
-          try {
-            cookieStore.set({ name, value, ...options })
-          } catch (error) {
-            // Handle cookie errors silently in production
-            if (process.env.NODE_ENV === 'development') {
-              console.error('Cookie set error:', error)
+          // Only set cookies in a server context
+          if (typeof window === 'undefined') {
+            try {
+              cookieStore.set({
+                name,
+                value,
+                path: '/',
+                ...options,
+                secure: process.env.NODE_ENV === 'production'
+              })
+            } catch (error) {
+              // Silent fail in development
             }
           }
         },
         remove(name: string, options: CookieOptions) {
-          try {
-            cookieStore.delete({ name, ...options })
-          } catch (error) {
-            // Handle cookie errors silently in production
-            if (process.env.NODE_ENV === 'development') {
-              console.error('Cookie remove error:', error)
+          // Only remove cookies in a server context
+          if (typeof window === 'undefined') {
+            try {
+              cookieStore.delete({ name, path: '/', ...options })
+            } catch (error) {
+              // Silent fail in development
             }
           }
         }
@@ -37,5 +54,5 @@ export function createClient(cookieStore = cookies()) {
   )
 }
 
-// Create a singleton instance for server-side usage
-export const supabaseServer = createClient()
+// Lazy initialize server client
+export const supabaseServer = () => createClient()

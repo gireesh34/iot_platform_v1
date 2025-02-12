@@ -7,8 +7,8 @@ import { cookies } from 'next/headers';
 import { Header } from "@/components/header"
 
 export default async function LandingPage() {
-  const cookieStore = await cookies();
-  const supabase = supabaseServer;
+  const cookieStore = cookies();
+  const supabase = supabaseServer();
 
   const { data: todos } = await supabase.from('todos').select();
 

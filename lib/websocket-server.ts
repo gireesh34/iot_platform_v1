@@ -6,7 +6,7 @@ import type { CustomWebSocket, WebSocketMessage } from "@/lib/types/websocket"
 import type { IncomingMessage } from "http"
 
 const wss = new WebSocketServer({ noServer: true })
-const supabase = createServerClient
+const supabase = createServerClient()
 
 export function setupWebSocketServer(server: any) {
   server.on("upgrade", async (request: IncomingMessage, socket: any, head: any) => {

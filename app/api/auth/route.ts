@@ -42,6 +42,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: error.message }, { status: 401 })
       }
 
+      // Return session directly without JWT
       return NextResponse.json({ 
         user: data.user,
         session: data.session 

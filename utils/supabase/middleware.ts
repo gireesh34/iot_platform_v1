@@ -9,7 +9,8 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL('/auth/login', req.url));
   }
 
-  const { data, error } = await supabaseServer.auth.getUser(token);
+  const supabase = supabaseServer()
+  const { data, error } = await supabase.auth.getUser(token);
 
   if (error || !data.user) {
     return NextResponse.redirect(new URL('/auth/login', req.url));
